@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="js/charts.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <title>VIsualizationAndAnaliz</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-primary">
+        <span class="navbar-txt">
+            VIsualizationAndAnaliz
+        </span>
+    </nav>
+    <div class="container">
+        <div class="d-flex flex-column" id="flexcontainer">
+
+            <div class="input-group mb-3 mt-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">File</span>
+                </div>
+                <div class="custom-file">
+                    <input type="file" onchange="showFile(this)" multiple class="custom-file-input" id="inputGroupFile1"
+                        aria-describedby="inputGroupFileAddon01">
+                    <label class="custom-file-label" id="labelfile" for="inputGroupFile01">File with results of
+                        test</label>
+                </div>
+            </div>
+
+            <div class="input-group mb-3 mt-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroupFileAddon02">File</span>
+                </div>
+                <div class="custom-file">
+                    <input type="file" onchange="showFile(this)" multiple class="custom-file-input"
+                        id="inputGroupFile01" aria-describedby="inputGroupFileAddon02">
+                    <label class="custom-file-label" id="labelfile" for="inputGroupFile01">File with test
+                        subjects</label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- <button type="button" class="btn btn-outline-primary ml-4" data-toggle="modal" onclick="ModalClik(this)" data-target="#Modal">
+        Table settigns
+    </button> -->
+    <div class="container-fluid">
+        <div id="dvCSV" class="mt-3" style="overflow: auto;"></div>
+    </div>
+    <div style="">
+        <canvas id="myChart"></canvas>
+    </div>
+</body>
+<script>
+    const bb = '';
+    var counter = 1;
+    function showFile(input) {
+        let filenames = "";
+        for (var i = 0; i < input.files.length; i++) {
+            filenames += input.files[i].name + "; "
+        }
+        let file = input.files[0];
+        Upload();
+        let label = document.getElementById("labelfile");
+        label.textContent = filenames;
+        let reader = new FileReader();
+        reader.readAsText(file);
+        
+        var container = document.getElementsByClassName("container")[0];
+        // var htmltexttomodal = 
+        if (document.getElementById("Modal") != null) {
+            return;
+        }
+
+        container.innerHTML += `<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Table settings</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">`+
+
+            `</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="ShowOrHide()" data-dismiss="modal">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-outline-primary ml-4" data-toggle="modal" onclick="ModalClik(this)" data-target="#Modal">
+        Table settigns
+    </button>`;
+
+   
+    const table = document.getElementById('dvCSV');
+        let texts = [];
+
+        function elems(element) {
+            element.childNodes.forEach(node => {
+                console.log(node);
+
+
+                // if(node.nodeName.match(/T\d/)) {
+                //     console.log(node);
+                // } else {
+                //     recursy(node);
+                // }
+            });
+        }
+        //elems(table);
+
+    //console.log(texts);
+    }
+    
+    
+    function ModalClik(data) {
+
+        var table = document.getElementById("csvtable");
+        var firstRow = table.querySelectorAll("tr:first-child")[0].cells;
+        var modalwin = document.getElementsByClassName("modal-body")[0];
+        var modalwinHtml = modalwin.innerHTML;
+        if (modalwinHtml != '') {
+            return;
+        }
+        var htmlcode = "";
+        // htmlcode+=`<div class="modalflexblock">`
+        for (var i = 0; i < firstRow.length; i++) {
+            if (i > 3) {
+                var options = `<option><</option>
+      <option><=</option>
+      <option>></option>
+      <option>>=</option>
+      <option>==</option>`
+            }
+            else {
+                var options = `<option>Contains</option>`;
+            }
+            htmlcode += `
+                
+                <div class="form-check form-switch" style="display:inline-block; width:250px">
+                    
+  <input class="form-check-input" type="checkbox" id="flexSwitchCheck_${i}" checked>
+  <label class="form-check-label" for="flexSwitchCheckChecked">${firstRow[i].innerText}</label>
+  
+</div>
+<select class="form-control form-control-sm" style="width:100px; display:inline;" id="FormControlSelect_${i}">` + options
+
+                + `</select>
+    
+    <input class="form-control form-control-sm ml-3" style="display:inline-block; width:200px" type="text" id="filtervalue_${i}" placeholder="Value">
+`;
+        }
+        // htmlcode+=`</div>`;
+        modalwinHtml += htmlcode;
+        modalwin.innerHTML += htmlcode;
+        
+    }
+    class Student {
+        constructor(name, email, score, scores) {
+            this.Name = name;
+            this.Email = email;
+            this.Score = score;
+            this.Scores = Scores;
+        }
+    }
+    
+    function Diagramms(students) {
+        
+    }
+    function Upload() {
+        var fileUpload = document.getElementById("inputGroupFile1");
+        var regex = /^.+(.csv|.txt)$/;///^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
+        var regextonum = /(\d+)(,)(\d+)/g;
+        var regcov = /"/g;
+        var score = [];
+        var name = [];
+        if (regex.test(fileUpload.value.toLowerCase())) {
+            if (typeof (FileReader) != "undefined") {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var table = document.createElement("table");
+                    table.classList.add("table");
+                    table.id = "csvtable";
+                    table.classList.add("table-bordered");
+                    var rows = e.target.result.split("\n");
+                    let students = rows;
+                    for (var i = 0; i < rows.length - 2; i++) {
+                        var cells = rows[i].replace(regextonum, "$1.$3");
+                        cells = cells.split(",");
+                        
+                        if (cells.length > 1) {
+                            var row = table.insertRow(-1);
+                            for (var j = 0; j < cells.length; j++) {
+                                if (j > 2 && j < 10 && j != 5) {
+                                    continue;
+                                }
+                                var cell = row.insertCell(-1);
+                                cell.innerHTML = cells[j].replace(regcov, "");
+                            }
+                        }
+                        
+                        //let sc = rows[i].split(",");
+                        
+                        // for(var j = 0; j < sc.length; j++) {
+                        //var s = parseInt(cells[10]);
+                        //score.push(parseFloat(sc1[10] + "." + sc1[11]));
+                        
+                        //name.push(sc1[0] + " " + sc1[1]);
+                        // }
+
+                        // var str = [];
+                        // for(var j = 0; j < cells.length; j++) {
+                        //     var scores = cells[j].match(/0\.\d*|-/);
+                        //     if(scores !== null) {
+                        //         str.push(scores);
+                        //     }
+                        // }
+                            
+                        
+                    }
+                    //    
+                    students.splice(0, 1).splice(students.length-2, 1);
+
+                    for(var k = 0; k < students.length-2; k++){
+                        let stud = students[k].split(",");  
+                        name.push(stud[0] + " " + stud[1]);
+                        let ar = parseFloat(stud[10].replace(/^./, "") + "." + stud[11].substring(0, 2));
+                        score.push(ar);
+                        
+                    }
+                    //const regExName = /w+/;
+                    
+                    // for(var i = 1; i < stud.length; i++) {
+                    //     var n = stud[i].replace(",");
+                    //     console.log(n);
+                    // }
+                    var dvCSV = document.getElementById("dvCSV");
+                    dvCSV.innerHTML = "";
+                    dvCSV.appendChild(table);
+                    document.getElementById("dvCSV_button_settings");
+                }
+                reader.readAsText(fileUpload.files[0]);
+            } else {
+                alert("ошибка.");
+            }
+        } else {
+            alert("ошибка.");
+        }
+        
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: name,
+                datasets: [{
+                    label: 'Students',
+                    data: score,
+                    
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        boxWidth: 80,
+                        fontColor: 'black'
+                    }
+                }
+            }
+        });
+
+        
+    }
+
+
+    function hideShowCollum(number, dislpay) {
+        var lastColHeader = Array.prototype.slice.call(document.getElementById("csvtable").querySelectorAll(`th:nth-child(${number})`, '#btt-ranges'), 0); // get the header cell
+        var lastColCells = Array.prototype.slice.call(document.getElementById("csvtable").querySelectorAll(`td:nth-child(${number})`, '#btt-ranges'), 0).concat(lastColHeader); // get the column cells, and add header
+
+        lastColCells.forEach(function (cell) { // iterate and hide
+            cell.style.display = dislpay;
+        });
+    }
+
+    function ShowOrHide() {
+
+        // var input, filter, table, tr, td, i, txtValue;
+        // input = document.getElementById("myInput");
+        // filter = input.value.toUpperCase();
+        // table = document.getElementById("csvtable");
+        // tr = table.getElementsByTagName("tr");
+
+        // // Loop through all table rows, and hide those who don't match the search query
+        // for (i = 0; i < tr.length; i++) {
+        //     td = tr[i].getElementsByTagName("td")[0];
+        //     if (td) {
+        //         txtValue = td.textContent || td.innerText;
+        //         if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        //             tr[i].style.display = "";
+        //         } else {
+        //             tr[i].style.display = "none";
+        //         }
+        //     }
+        // }
+
+
+
+
+        var checkboxs = document.getElementsByClassName("form-check-input");
+        for (var i = 0; i < checkboxs.length; i++) {
+            if (checkboxs[i].checked) {
+                hideShowCollum(i + 1, 'table-cell')
+            }
+            else {
+                hideShowCollum(i + 1, 'none')
+            }
+        }
+        for (var i = 4; i <= 4; i++) {
+            var charfilter = document.getElementById(`FormControlSelect_${i}`).value;   
+         var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById(`filtervalue_${i}`);
+        filter = input.value;
+         
+        table = document.getElementById("csvtable");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (var j = 1; j < tr.length; j++) {
+            td = tr[j].getElementsByTagName("td")[i];
+            if (td) {
+                if(filter=='')
+                {
+                    tr[j].style.display = "";
+                    continue;  
+                }
+               
+                txtValue = td.textContent || td.innerText;
+                if (eval(`Number(txtValue) ${charfilter} Number(filter)`)) {
+                    tr[j].style.display = "";
+                } else {
+                    tr[j].style.display = "none";
+                }
+            }
+        }
+
+        }
+
+
+    }
+    
+</script>
+
+</html>

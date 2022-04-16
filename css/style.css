@@ -1,0 +1,23 @@
+.navbar-txt{
+    font-size: large;
+    color: white;
+}
+
+.custom-file-input:lang(en)~.custom-file-label::after {
+    content: "Browse";
+}
+
+table {
+    border-collapse: collapse;
+    border: 2px black solid;
+    font: 12px sans-serif;
+}
+
+td {
+    border: 1px black solid;
+    padding: 5px;
+}
+
+.modalflexblock{
+    display: flex;
+}
